@@ -62,3 +62,39 @@ Outputs:
   PublicIp:
     Value: !GetAtt EC2Instance.PublicIp
     Description: Public IP of the EC2 instances (if assigned)
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Reusable CloudFormation template for creating a secure S3 bucket
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 bucket
+
+Resources:
+  SecureS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+
+      VersioningConfiguration:
+        Status: Enabled
+
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref SecureS3Bucket
+
+  BucketArn:
+    Description: ARN of the created S3 bucket
+    Value: !GetAtt SecureS3Bucket.Arn
